@@ -1,0 +1,16 @@
+{
+    "students": 
+    [
+	    {
+	        "name": "tobby48",
+			"age": 32,
+			"addresses": ["안흥동", "증포동"]
+	    },
+	    {
+	        "name": "hama",
+			"age": 30,
+			"addresses": ["백사면", "부발읍"]
+	    }
+    ],
+    "academyName":"swhacademy"
+}

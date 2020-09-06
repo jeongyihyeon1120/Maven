@@ -1,0 +1,7 @@
+use IyHyeon;
+CREATE TABLE NEWS (
+   id INT NOT NULL,
+   title VARCHAR(255) default NULL,
+   script TEXT default NULL,
+   PRIMARY KEY (id)
+);
