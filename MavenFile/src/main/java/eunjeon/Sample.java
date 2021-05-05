@@ -6,15 +6,15 @@ import org.bitbucket.eunjeon.seunjeon.Analyzer;
 import org.bitbucket.eunjeon.seunjeon.Eojeol;
 import org.bitbucket.eunjeon.seunjeon.LNode;
 
-class Smaple {
-    public void main(String[] args) {
+public class Sample {
+    public static void main(String[] args) {
         // 형태소 분석
-        for (LNode node : Analyzer.parseJava("아버지가방에들어가신다.")) {
+        for (LNode node : Analyzer.parseJava("너가 먹은 빵은 검은 빵이다.")) {
             System.out.println(node);
         }
 
         // 어절 분석
-        for (Eojeol eojeol: Analyzer.parseEojeolJava("아버지가방에들어가신다.")) {
+        for (Eojeol eojeol: Analyzer.parseEojeolJava("너가 먹은 빵은 검은 빵이다.")) {
             System.out.println(eojeol);
             for (LNode node: eojeol.nodesJava()) {
                 System.out.println(node);

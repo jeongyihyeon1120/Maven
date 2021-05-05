@@ -6,6 +6,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+
 
 /**
  * <pre>
@@ -93,7 +95,22 @@ public class Query2 {
 			session.close(); 
 		}
 	}
-
+	
+	public void getPerson(String name) {
+		Session session = sessionFactory.openSession();
+		
+		Query query = session.createQuery("FROM Person Where first_name=:name");
+        query.setParameter("name", name);
+        Iterator<Person> iterator = query.getResultList().iterator();
+		while(iterator.hasNext()){
+			Person person = (Person) iterator.next(); 
+			System.out.print("Find First Name: " + person.getFirstName()); 
+			System.out.print("Find Last Name: " + person.getLastName()); 
+			System.out.println("Find Salary: " + person.getSalary()); 
+		}
+		
+	}
+	
 	public static void main( String[] args ){
 		sessionFactory = HibernateAnnotationUtil.getSessionFactory();
 
@@ -106,6 +123,7 @@ public class Query2 {
 		query.updatePerson(value1, 5000);
 		query.deletePerson(value2);
 		query.listPerson();
+		query.getPerson("유키");
 		
 		sessionFactory.close();
 	}

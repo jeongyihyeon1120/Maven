@@ -17,21 +17,25 @@ import javax.persistence.*;
 @Entity
 @Table(name = "Disease")
 public class Disease {
-	@Column(name = "date",columnDefinition = "INT")
-	private int date;
 	
-	@Column(name = "id",columnDefinition = "INT")
-	private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "pk")
+	private int pk;
+	
+	@Column(name = "dt",columnDefinition = "CHAR(8)")
+	private String dt;
 	
 	@Column(name = "patientNum",columnDefinition = "INT")
 	private int patientNum;
 	
-	@Column(name = "diseaseCode",columnDefinition = "INT")
-	private int diseaseCode;
-	
-	@ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+	@ManyToOne
+	@JoinColumn(name = "diseaseCode",nullable=false)
+	private DiseaseCode diseaseCode;
+
+	@ManyToOne
 	@JoinColumn(name="CountyCode", nullable=false)
-	private transient County county;
+	private County county;
 
 	public Disease() {
 		// TODO Auto-generated constructor stub
@@ -45,20 +49,12 @@ public class Disease {
 		this.county = county;
 	}
 
-	public int getDate() {
-		return date;
+	public String getDt() {
+		return dt;
 	}
 
-	public void setDate(int date) {
-		this.date = date;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
+	public void setDt(String dt) {
+		this.dt = dt;
 	}
 
 	public int getPatientNum() {
@@ -69,13 +65,20 @@ public class Disease {
 		this.patientNum = patientNum;
 	}
 	
-	public int getDiseaseCode() {
+	public DiseaseCode getDiseaseCode() {
 		return diseaseCode;
 	}
-	
-	public void setDiseaseCode(int diseaseCode) {
+
+	public void setDiseaseCode(DiseaseCode diseaseCode) {
 		this.diseaseCode = diseaseCode;
 	}
+
+	public int getPk() {
+		return pk;
+	}
 	
+	public void setPrimary(int pk) {
+		this.pk = pk;
+	}
 	
 }

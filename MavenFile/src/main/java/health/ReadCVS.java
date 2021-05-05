@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,14 +13,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
-import News.AnnoDoc;
-import News.NewsAnnotationUtil;
 
 public class ReadCVS {
 
-	private static List<String[]> cityList = new ArrayList<String[]>();
-	private static List<String[]> countyList = new ArrayList<String[]>();
-	private static List<String[]> disease = new ArrayList<String[]>();
+	private List<String[]> cityList = new ArrayList<String[]>();
+	private List<String[]> countyList = new ArrayList<String[]>();
+	private List<String[]> disease = new ArrayList<String[]>();
+	private List<String> diseaseName = Arrays.asList("감기", "눈병", "천식", "피부염");
 
 	private static SessionFactory sessionFactory = HealthAnnoUtil.getSessionFactory();
 	
@@ -116,23 +116,27 @@ public class ReadCVS {
 
 	}
 
-	public void citySave(String cityCode, String cityName, Set<County> countySet) {
+	public City citySave(String cityCode, String cityName) {
+		tx = session.beginTransaction();
+		City city = new City();
 		try {
-			City city = new City();
 			city.setCode(Integer.valueOf(cityCode));
 			city.setCity(cityName);
-//			city.setCounty(countySet);
 			session.save(city);
 		}catch (Exception e) {
 			if (tx!=null) tx.rollback();
 			e.printStackTrace(); 
 		}
+		tx.commit();
+		return city;
 	}
-	public void countySave(String cityCode, String countyCode, String countyName, City city) {
-		
+	public County countySave(String countyCode, String countyName, City city) {
+		tx = session.beginTransaction();
+		County county = new County();
+		if (city == null) {
+			return null;
+		}
 		try {
-			County county = new County();
-			county.setCityCode(Integer.valueOf(cityCode));
 			county.setCountyCode(Integer.valueOf(countyCode));
 			county.setCounty(countyName);
 			county.setCity(city);
@@ -141,19 +145,47 @@ public class ReadCVS {
 			if (tx!=null) tx.rollback();
 			e.printStackTrace(); 
 		}
+		tx.commit();
+		return county;
 	}
-	public void diseaseSave(String date, String countyCode, String occur, String diseaseCode) {
+	
+	
+	public void diseaseSave(String date, String occur, DiseaseCode diseaseCode, County county) {
+		tx = session.beginTransaction();
+		Disease disease = new Disease();
 		try {
-			
-		} catch (Exception e) {
-			// TODO: handle exception
+			disease.setDt(date);
+			disease.setPatientNum(Integer.valueOf(occur));
+			disease.setDiseaseCode(diseaseCode);
+			disease.setCounty(county);
+			session.save(disease);
+		}catch (Exception e) {
+			if (tx!=null) tx.rollback();
+			e.printStackTrace(); 
 		}
+		tx.commit();
 	}
+	
+	public DiseaseCode choiceCode(int code) {
+		DiseaseCode dc = new DiseaseCode();
+		dc.setDiseaseCode(code);
+		dc.setDiseaseName(diseaseName.get(code));
+		return dc;
+		
+	}
+	
+	public void diseaseCodeSave(int code) {
+		tx = session.beginTransaction();
+		DiseaseCode diseaseCode = new DiseaseCode();
+		diseaseCode.setDiseaseCode(code);
+		diseaseCode.setDiseaseName(diseaseName.get(code));
+		session.save(diseaseCode);
+		tx.commit();
+	}
+
 	
 	public static void main(String ars[]) {
 		ReadCVS rc = new ReadCVS();
-		City city = new City();
-
 		String locationFilePath = "C:\\Users\\yhyeon\\Downloads\\국민건강보험공단 실제진료정보(20191219)\\";
 
 		File dir = new File(locationFilePath);
@@ -166,22 +198,40 @@ public class ReadCVS {
 				rc.readCVS(locationFilePath + fileName, fileName);
 			}
 		}
-		Set<County> countySet = new HashSet<County>();
-		for (String[] cityArr : cityList) {
+		
+		for (int i = 0; i < rc.diseaseName.size(); i++) {
+			rc.diseaseCodeSave(i);
+		}
+		
+		for (String[] cityArr : rc.cityList) {
 			int count = 0;
-			tx = session.beginTransaction();
-			for (String[] countyArr : countyList) {
-				if (!countyArr[0].equals(cityArr[0])) break;
-				County county = new County();
-				countySet.add(county);
-//				rc.countySave(countyArr[0], countyArr[1], countyArr[2], city);
+//			tx = session.beginTransaction();
+			City city = rc.citySave(cityArr[0], cityArr[1]);
+			for (String[] countyArr : rc.countyList) {
+				if (!countyArr[0].equals(cityArr[0])) continue;
+				County county = rc.countySave(countyArr[1], countyArr[2], city);
 				count++;
+				int c = 0;
+				for (String[] disArr : rc.disease) {
+					if (c == 100) {
+						break;
+					}
+					c++;
+					if(!disArr[1].equals(countyArr[1])) {
+						c--;
+						continue;
+					}
+					rc.diseaseSave(disArr[0], disArr[2], rc.choiceCode(Integer.valueOf(disArr[3])), county);
+				}
+				for (int i = 0; i < rc.disease.size(); i++) {
+					
+				}
 			}
-			rc.citySave(cityArr[0], cityArr[1], countySet);
-			tx.commit();
+//			tx.commit();
 			for (int i = 0; i < count; i++) {
-				countyList.remove(0);
+				rc.countyList.remove(0);
 			}
+			
 		}
 		session.close();
 	}

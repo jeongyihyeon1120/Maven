@@ -6,8 +6,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
-import News.AnnoDoc;
-
 /**
  * <pre>
  * health 
@@ -29,8 +27,9 @@ public class HealthAnnoUtil {
 			Configuration configuration = new Configuration().configure("hibernate-annotation-health.cfg.xml");
 			
 			configuration.addAnnotatedClass(City.class);
-//			configuration.addAnnotatedClass(County.class);
-//			configuration.addAnnotatedClass(Disease.class);
+			configuration.addAnnotatedClass(County.class);
+			configuration.addAnnotatedClass(Disease.class);
+			configuration.addAnnotatedClass(DiseaseCode.class);
 			
 			serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 			sessionFactory = configuration.buildSessionFactory(serviceRegistry);

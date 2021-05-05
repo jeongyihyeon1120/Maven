@@ -20,9 +20,6 @@ import javax.persistence.*;
 @Table(name = "County")
 public class County {
 	
-	@Column(name = "cityCode",columnDefinition = "INT")
-	private int cityCode;
-	
 	@Id
 	@Column(name = "countyCode",columnDefinition = "INT")
 	private int countyCode;
@@ -30,34 +27,25 @@ public class County {
 	@Column(name = "county",columnDefinition = "varchar(20)")
 	private String county;
 	
-	@ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
-	@JoinColumn(name="city_code", nullable=false)
-	private transient City city; // transient는 city를 저장하기 않는 것 (지정 안하면 자동 저장됨)
+	@ManyToOne
+	@JoinColumn(name="cityCode", nullable=false)
+	private City city;
 	
-//	@OneToMany
-//	private transient Set<Disease> diseases;
+	@OneToMany(mappedBy = "county")
+	private transient Set<Disease> diseases;
 
-//	public Set<Disease> getDiseases() {
-//		return diseases;
-//	}
-//
-//
-//	public void setDiseases(Set<Disease> diseases) {
-//		this.diseases = diseases;
-//	}
+	public Set<Disease> getDiseases() {
+		return diseases;
+	}
+
+
+	public void setDiseases(Set<Disease> diseases) {
+		this.diseases = diseases;
+	}
 
 
 	public County() {
 		// TODO Auto-generated constructor stub
-	}
-	
-
-	public int getCityCode() {
-		return cityCode;
-	}
-
-	public void setCityCode(int cityCode) {
-		this.cityCode = cityCode;
 	}
 
 	public int getCountyCode() {

@@ -26,8 +26,8 @@ public class City {
 	@Column(name = "city",columnDefinition = "char(4)")
 	private String city;
 	
-//	@OneToMany
-//	private transient Set<County> county;
+	@OneToMany(mappedBy = "city")
+	private transient Set<County> county;
 	
 	public City() {
 		// TODO Auto-generated constructor stub
@@ -49,12 +49,12 @@ public class City {
 		this.city = city;
 	}
 
-//	public Set<County> getCounty() {
-//		return county;
-//	}
-//
-//	public void setCounty(Set<County> county) {
-//		this.county = county;
-//	}
+	public Set<County> getCounty() {
+		return county;
+	}
+
+	public void setCounty(Set<County> county) {
+		this.county = county;
+	}
 	
 }
